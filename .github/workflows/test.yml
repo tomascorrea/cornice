@@ -18,6 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+        marshmallow-version: ["marshmallow>=3.13,<4", "marshmallow>=4"]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +31,9 @@ jobs:
 
       - name: Install dependencies
         run: make install
+
+      - name: Install marshmallow ${{ matrix.marshmallow-version }}
+        run: .venv/bin/pip install "${{ matrix.marshmallow-version }}"
 
       - name: Run unit tests
         run: make test

@@ -5,6 +5,8 @@
 import inspect
 from contextvars import ContextVar
 
+from cornice.validators._marshmallow_compat import EXCLUDE, set_schema_context
+
 
 cornice_request: ContextVar = ContextVar("cornice_request")
 
@@ -44,7 +46,6 @@ def _generate_marshmallow_validator(location):
         """
         import marshmallow
         import marshmallow.schema
-        from marshmallow import EXCLUDE
 
         if schema is None:
             return
@@ -56,6 +57,7 @@ def _generate_marshmallow_validator(location):
         class ValidatedField(marshmallow.fields.Field):
             def _deserialize(self, value, attr, data, **kwargs):
                 cornice_request.set(request)
+                set_schema_context(schema, "request", request)
                 deserialized = schema.load(value)
                 return deserialized
 
@@ -135,6 +137,7 @@ def validator(request, schema=None, deserializer=None, **kwargs):
 
     schema = _instantiate_schema(schema)
     cornice_request.set(request)
+    set_schema_context(schema, "request", request)
 
     cstruct = deserializer(request)
     try:

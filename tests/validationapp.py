@@ -330,9 +330,9 @@ if COLANDER:
 
 try:
     import marshmallow
-    from marshmallow import EXCLUDE
 
     from cornice.validators import cornice_request, marshmallow_body_validator, marshmallow_validator
+    from cornice.validators._marshmallow_compat import EXCLUDE
 
     MARSHMALLOW = True
 except ImportError:
@@ -368,6 +368,7 @@ if MARSHMALLOW:
         @marshmallow.validates_schema
         def validate_csrf_secret(self, data, **kwargs):
             # simulate validation of session variables
+            # cornice_request contextvar works on both v3 and v4
             if cornice_request.get().get_csrf() != data.get("csrf_secret"):
                 raise marshmallow.ValidationError("Wrong token")
 
