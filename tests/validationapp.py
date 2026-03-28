@@ -330,12 +330,9 @@ if COLANDER:
 
 try:
     import marshmallow
+    from marshmallow import EXCLUDE
 
-    try:
-        from marshmallow.utils import EXCLUDE
-    except ImportError:
-        EXCLUDE = "exclude"
-    from cornice.validators import marshmallow_body_validator, marshmallow_validator
+    from cornice.validators import cornice_request, marshmallow_body_validator, marshmallow_validator
 
     MARSHMALLOW = True
 except ImportError:
@@ -355,7 +352,6 @@ if MARSHMALLOW:
 
     class MSignupSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         username = marshmallow.fields.String()
@@ -364,16 +360,15 @@ if MARSHMALLOW:
 
     class MNeedsContextSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
-        somefield = marshmallow.fields.Float(missing=lambda: random.random())
+        somefield = marshmallow.fields.Float(load_default=lambda: random.random())
         csrf_secret = marshmallow.fields.String()
 
         @marshmallow.validates_schema
         def validate_csrf_secret(self, data, **kwargs):
             # simulate validation of session variables
-            if self.context["request"].get_csrf() != data.get("csrf_secret"):
+            if cornice_request.get().get_csrf() != data.get("csrf_secret"):
                 raise marshmallow.ValidationError("Wrong token")
 
     @m_bound.post(schema=MNeedsContextSchema, validators=(marshmallow_body_validator,))
@@ -402,26 +397,23 @@ if MARSHMALLOW:
 
     class MBodySchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         # foo and bar are required, baz is optional
         foo = marshmallow.fields.String()
         bar = SchemaNode(String(), validator=m_validate_bar)
-        baz = marshmallow.fields.String(missing=None)
-        ipsum = marshmallow.fields.Integer(missing=1, validate=marshmallow.validate.Range(0, 3))
+        baz = marshmallow.fields.String(load_default=None)
+        ipsum = marshmallow.fields.Integer(load_default=1, validate=marshmallow.validate.Range(0, 3))
         integers = marshmallow.fields.List(marshmallow.fields.Integer())
 
     class MQuery(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         yeah = marshmallow.fields.String()
 
     class MRequestSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         body = marshmallow.fields.Nested(MBodySchema)
@@ -432,7 +424,7 @@ if MARSHMALLOW:
         return {"test": "succeeded"}
 
     class MListQuerystringSequenced(marshmallow.Schema):
-        field = marshmallow.fields.List(marshmallow.fields.String(), many=True)
+        field = marshmallow.fields.List(marshmallow.fields.String())
 
         @marshmallow.pre_load()
         def normalize_field(self, data, **kwargs):
@@ -442,7 +434,6 @@ if MARSHMALLOW:
 
     class MQSSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         querystring = marshmallow.fields.Nested(MListQuerystringSequenced)
@@ -453,14 +444,12 @@ if MARSHMALLOW:
 
     class MNewsletterSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         email = marshmallow.fields.String(validate=marshmallow.validate.Email())
 
     class MRefererSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         ref = marshmallow.fields.Integer()
@@ -485,14 +474,12 @@ if MARSHMALLOW:
 
     class MItemPathSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
-        item_id = marshmallow.fields.Integer(missing=None)
+        item_id = marshmallow.fields.Integer(load_default=None)
 
     class MItemSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         path = marshmallow.fields.Nested(MItemPathSchema)
@@ -507,7 +494,6 @@ if MARSHMALLOW:
 
     class MFormSchema(marshmallow.Schema):
         class Meta:
-            strict = True
             unknown = EXCLUDE
 
         field1 = marshmallow.fields.String()
