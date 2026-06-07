@@ -331,7 +331,11 @@ if COLANDER:
 try:
     import marshmallow
 
-    from cornice.validators import cornice_request, marshmallow_body_validator, marshmallow_validator
+    from cornice.validators import (
+        cornice_request,
+        marshmallow_body_validator,
+        marshmallow_validator,
+    )
     from cornice.validators._marshmallow_compat import EXCLUDE
 
     MARSHMALLOW = True
@@ -404,7 +408,9 @@ if MARSHMALLOW:
         foo = marshmallow.fields.String()
         bar = SchemaNode(String(), validator=m_validate_bar)
         baz = marshmallow.fields.String(load_default=None)
-        ipsum = marshmallow.fields.Integer(load_default=1, validate=marshmallow.validate.Range(0, 3))
+        ipsum = marshmallow.fields.Integer(
+            load_default=1, validate=marshmallow.validate.Range(0, 3)
+        )
         integers = marshmallow.fields.List(marshmallow.fields.Integer())
 
     class MQuery(marshmallow.Schema):

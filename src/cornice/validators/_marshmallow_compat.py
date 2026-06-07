@@ -4,16 +4,14 @@
 
 from importlib.metadata import version
 
-import marshmallow
-
 
 MARSHMALLOW_V4 = int(version("marshmallow").split(".")[0]) >= 4
 
 # EXCLUDE moved from marshmallow.utils to marshmallow in v4
 if MARSHMALLOW_V4:
-    from marshmallow import EXCLUDE
+    from marshmallow import EXCLUDE  # noqa: F401
 else:
-    from marshmallow.utils import EXCLUDE
+    from marshmallow.utils import EXCLUDE  # noqa: F401
 
 
 def set_schema_context(schema, key, value):

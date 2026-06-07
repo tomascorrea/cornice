@@ -83,9 +83,7 @@ def _generate_marshmallow_validator(location):
                 :type dct: dict
                 """
 
-                class_attrs[location] = ValidatedField(
-                    required=True, data_key=location
-                )
+                class_attrs[location] = ValidatedField(required=True, data_key=location)
                 class_attrs["Meta"] = Meta
                 return type(name, bases, class_attrs)
 
