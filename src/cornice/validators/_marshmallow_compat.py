@@ -8,13 +8,13 @@ from importlib.metadata import version
 MARSHMALLOW_V4 = int(version("marshmallow").split(".")[0]) >= 4
 
 # EXCLUDE moved from marshmallow.utils to marshmallow in v4
-if MARSHMALLOW_V4:
+if MARSHMALLOW_V4:  # pragma: no cover
     from marshmallow import EXCLUDE  # noqa: F401
-else:
+else:  # pragma: no cover
     from marshmallow.utils import EXCLUDE  # noqa: F401
 
 
 def set_schema_context(schema, key, value):
     """Set context on schema. Uses Schema.context on v3, no-op on v4."""
-    if not MARSHMALLOW_V4:
+    if not MARSHMALLOW_V4:  # pragma: no cover
         schema.context.setdefault(key, value)
